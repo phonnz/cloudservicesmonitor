@@ -136,6 +136,8 @@ app.get('/', function (req, res) {
 			console.log(key + ':' + results[key])
 			
 		})
+
+		console.log(response['headers'])
 	});
 
 	/*console.log(results)*/
