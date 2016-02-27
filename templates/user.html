@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<h1>{{currentUser.username}}</h1>
+
+	<p>Movies in queue</p>
+	{% for ref in refs %}
+		{% if !ref.watched %}
+		<div><a href="/movies/{{ ref.movie.imdb }}">{{ ref.movie.title }}</a></div>
+		{% endif %}
+	{% endfor %}
+	
+	<p>Movies watched</p>
+	{% for ref in refs %}
+		{% if ref.watched %}
+		<div><a href="/movies/{{ ref.movie.imdb }}">{{ ref.movie.title }}</a></div>
+		{% endif %}
+	{% endfor %}	
+
+</body>
+</html>

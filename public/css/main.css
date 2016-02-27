@@ -1,0 +1,41 @@
+/*html {
+	background-color: #111;
+    color: #f6f6f6;
+    font-size: 1em;
+    line-height: 1.4;
+}*/
+.navbar{	
+	padding: 10px 15px;
+	/*min-height: 80px;*/
+}
+.navbar-brand img{
+	margin: -28px 0 20px 5px;
+}
+
+.row{
+    margin-top: 5px;
+}
+
+
+#content{
+	margin: auto;
+	width: 90%;
+}
+
+
+.notification{	
+	border-radius: 10px;
+	color: #fefffd;
+	padding: 6px;
+	text-align: center;
+}
+
+.success{
+	background-color: #629d0b;
+	border: 2px solid #304e06;
+}
+
+.error{
+	background-color: #f51d1c;
+	border: 2px solid #b40808;
+}
