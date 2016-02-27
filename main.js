@@ -10,6 +10,8 @@ var MongoStore = require('express-session-mongo')
 var flash = require('flash')
 
 var request = require('request')
+var ping = require('net-ping')
+var dns = require('dns');
 
 var Schema = mongoose.Schema
 
@@ -77,9 +79,41 @@ app.get('/', function (req, res) {
 	
 	var notifications = []
 	var results = {}
+	var pingSession = ping.createSession ()
+	var domain = "telegana.tv"
+	var ip = '127.0.0.1'
+	var path = '/api/channel'
+	var url = 'http://' + domain + path
+
+ 
+	dns.resolve4(domain, function (err, addresses) {
+		console.log('dns')
+	  if (err) throw err;
+	 
+	  console.log('addresses for ' + domain + ': ' + JSON.stringify(addresses));
+		ip  = addresses[0]
+	  /*addresses.forEach(function (a) {
+	    dns.reverse(a, function (err, domains) {
+	      if (err) {
+	        console.log('reverse for ' + a + ' failed: ' +
+	          err.message);
+	      } else {
+	        console.log('reverse for ' + a + ': ' +
+	          JSON.stringify(domains));
+	      }
+	    });
+	  });*/
+
+		pingSession.pingHost(ip, function (error, ip) {
+			if (error)
+				console.log (domain + ' ' + ip + ": " + error.toString ())
+			else
+				console.log (domain + ' ' + ip + ": Alive")
+		})
 
 
-	url = "http://telegana.tv/api/channel"
+
+	});
 	
 	
 
