@@ -65,7 +65,10 @@ var app = express()
 // Add sessions and flash
 app.use(session({
 	secret: 'keyboard cat',
-	store: new MongoStore(),
+	/*store: new MongoStore(),*/
+    store: new MongoStore({
+        server: process.env.MONGOLAB_URI    
+    }),
 	saveUninitialized: true,
 	resave: true
 }))
