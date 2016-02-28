@@ -1,6 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
-{%for result in results %}
-{{ result }}
-{% endfor %}
+<aside id="left-bar">
+<ul>
+	{% for service in services %}
+	<li>{{ service.name }}<br/>{{ service.host.url }}<br/>{{ service.host.ip }}</li>
+	{% endfor %}
+</ul>	
+</aside>
+
+<div id="service-content">
+<ul>
+	{% for result in results %}
+	<li>{{ result.name }}:{{ result.value }}</li>
+	{% endfor %}
+</ul>
+
+</div>
 {% endblock %}

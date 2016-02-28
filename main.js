@@ -11,7 +11,8 @@ var flash = require('flash')
 
 var request = require('request')
 var ping = require('net-ping')
-var dns = require('dns');
+var dns = require('dns')
+/*var fs = require("fs")*/
 
 var Schema = mongoose.Schema
 
@@ -22,7 +23,7 @@ mongoose.connect('mongodb://localhost/csm')
 
 var ServiceSchema = new Schema({
 	name: String,
-	url: String,
+	host: {url: String, ip: String},
 	port: {type:Number, default: 80},
 	responsePattern: String,
 	created: { type: Date, default: Date.now },
@@ -78,12 +79,22 @@ app.use('/assets', express.static('public'));
 app.get('/', function (req, res) {
 	
 	var notifications = []
-	var results = {}
+	var services
+
+	Service.find({}).sort({name: 1 }).exec(function(servicesList){
+		services = List
+	})
+
+	var results = []
 	var pingSession = ping.createSession ()
 	var domain = "telegana.tv"
 	var ip = '127.0.0.1'
 	var path = '/api/channel'
 	var url = 'http://' + domain + path
+
+	var options = { url : url, 
+					time : true,
+	}
 
  
 	dns.resolve4(domain, function (err, addresses) {
@@ -104,11 +115,12 @@ app.get('/', function (req, res) {
 	    });
 	  });*/
 
-		pingSession.pingHost(ip, function (error, ip) {
+		pingSession.pingHost(ip, function (error, ip, sent, rcvd) {
+			var ms = rcvd - sent
 			if (error)
 				console.log (domain + ' ' + ip + ": " + error.toString ())
 			else
-				console.log (domain + ' ' + ip + ": Alive")
+				console.log (domain + ' ' + ip + ": Alive (ms=" + ms + ")")
 		})
 
 
@@ -118,34 +130,42 @@ app.get('/', function (req, res) {
 	
 
 	/* Using request for make a rhttprequest */
-	request(url, function(error, response, body) {
+	request(options, function(error, response, body) {
 		/*console.log(response['headers'])*/
 		/*console.log('************************<')
 		Object.keys(response['socket']).forEach(function(par){
 			console.log(par)
 		})
 		*/
-		results['defaultEncoding'] = response['_readableState']['defaultEncoding']
-		results['webserver'] = (response['headers']['server']).split(' ')[0]
-		results['server'] = (response['headers']['server']).split(' ')[1]
-		results['statusCode'] = response['statusCode']
-		results['statusMessage'] = response['statusMessage']
+		results.push({name : 'defaultEncoding', value: response['_readableState']['defaultEncoding']})
+		results.push({name : 'webserver', value: (response['headers']['server']).split(' ')[0]})
+		results.push({name : 'server', value: (response['headers']['server']).split(' ')[1]})
+		results.push({name : 'serverDate', value:response['headers']['date'] })
+		results.push({name : 'statusCode', value: response['statusCode']})
+		results.push({name : 'statusMessage', value: response['statusMessage']})
+		results.push({name : 'contentType', value: response.headers['content-type'] })
+		results.push({name : 'elapsedTime', value: response['elapsedTime']})
 	
 		console.log('===================')
-		Object.keys(results).forEach(function(key){
+		/*Object.keys(results).forEach(function(key){
 			console.log(key + ':' + results[key])
 			
+		})*/
+		results.forEach(function(result){
+			console.log(result.name, result.value)
 		})
 
-		console.log(response['headers'])
+		res.render('index', { results:results, notifications:notifications, services:services})
+		
 	});
 
-	/*console.log(results)*/
+	console.log(results)
 	while(res.locals.flash.length > 0){
 		notifications.push(res.locals.flash.pop())
 	}
+	console.log(typeof notifications)
+	console.log(notifications)
 
-	res.render('index', { results:results, notifications:notifications})
 })
 
 	
