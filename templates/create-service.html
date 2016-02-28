@@ -9,22 +9,22 @@
 		    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="BRVO API" name="name">
 		</div>
 		<div class="form-group">
-		    <label for="exampleInputEmail1">URL</label>
-		    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="http://api.brvo.com" name="url">
+		    <label for="exampleInputEmail1">Host</label>
+		    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="http://api.brvo.com" name="host">
 		</div>
 		<div class="form-group">
 		    <label for="exampleInputEmail1">Puerto</label>
-		    <input type="number" class="form-control" id="exampleInputEmail1" placeholder="22" name="port" text="80">
+		    <input type="number" class="form-control" id="exampleInputEmail1" placeholder="8080" name="port" value="80">
 		</div>
 		<div class="form-group">
 		    <label for="exampleInputEmail1">Posible respuesta</label>
-		    <textarea type="text" class="form-control" id="exampleInputEmail1" placeholder="100" name="price" rows="10"></textarea> 
+		    <textarea type="text" class="form-control" id="exampleInputEmail1" placeholder="[{'type_channel': 'Television','name_channel': 'BBC','channel_themes': [{'color': '#0C1C1B','alternative_back_image': ','channel_id': 1,'main_button': 'http://bbc.blob.core.windows.net/bbc/2015_10_13_17_51_24_btn_siete_on.png','id': 8}],'id': 1,'hb_code': 330001},]" name="responsePattern" rows="10"></textarea> 
 		</div>
-		<div class="form-group">
-		    <label for="exampleInputEmail1">Ciudad</label>
-		    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="México" name="city">
-		</div>
+		
 
-		<button type="submit" class="btn btn-default">Guardar</button>
+		<button type="submit" class="btn btn-success">Agregar servicio</button>
 	</form>
 {% endblock %}
+
+
+[{'type_channel': 'Television','name_channel': 'BBC','channel_themes': [{'color': '#0C1C1B','alternative_back_image': ','channel_id': 1,'main_button': 'http://bbc.blob.core.windows.net/bbc/2015_10_13_17_51_24_btn_siete_on.png','id': 8}],'id': 1,'hb_code': 330001},]

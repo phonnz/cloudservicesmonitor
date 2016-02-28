@@ -36,6 +36,20 @@ var Service = mongoose.model('Service', ServiceSchema)
 
 
 ServiceSchema.pre('save', function (next) {
+	var isDomain = false
+	this.host.url = this.host.url.replace('http://','')
+
+	for(i = 0; i < this.host.url.length; i++){
+		if(this.host.url.charAt(i) > '9'){
+			console.log('Have chars')
+			isDomain = true
+			return
+		}
+	}
+	if(!isDomain) {
+		this.host.ip = this.host.url
+		this.host.url = ''
+	}
 	
   next();
 });
@@ -82,8 +96,9 @@ app.get('/', function (req, res) {
 	var services
 
 	Service.find({}).sort({name: 1 }).exec(function(servicesList){
-		services = List
+		services = servicesList
 	})
+	console.log(services)
 
 	var results = []
 	var pingSession = ping.createSession ()
@@ -166,6 +181,39 @@ app.get('/', function (req, res) {
 	console.log(typeof notifications)
 	console.log(notifications)
 
+})
+
+app.get('/create-service', function (req, res){
+	var error = res.locals.flash.pop()
+
+	res.render('create-service',{
+		error: error
+	})
+	
+})
+
+app.post('/create-service', function(req, res){
+
+		Service.create({
+
+			name: req.body.name,
+			host : {url :req.body.host,},
+			port: req.body.port,
+			responsePattern: req.body.responsePattern,
+		},
+			function(err, serv){
+					if(err){
+						req.flash('warning', 'No se logró crear el servicio')
+						req.flash('danger', '500 - Internal server error')
+						/*res.render(500, 'Internal server Error')*/
+						res.redirect('/')
+					}
+					req.flash('success', 'Se agregó ' + req.body.name + ' como servicio.')
+					/*req.flash('danger', 'No has iniciado sesión, los posts no tendrán tu nombre')*/
+					res.redirect('/')
+					
+				})
+	
 })
 
 	
