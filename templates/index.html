@@ -1,19 +1,38 @@
 {% extends 'base.html' %}
 {% block content %}
-<aside id="left-bar">
+<aside id="left-bar" class="col-md-3">
 <ul>
 	{% for service in services %}
-	<li>{{ service.name }}<br/>{{ service.host.url }}<br/>{{ service.host.ip }}</li>
+	<div class="panel panel-success">
+	<div class="panel-heading"> 
+		<h3 class="panel-title"><a href="/service/{{ service.id }}">{{ service.name }}</a></h3> </div>		
+	<div class="panel-body">
+		{{ service.host.url }}<br/>{{ service.host.ip }}
+	</div>
+		
+	</div><!-- 
+<div class="panel panel-primary">...</div>
+<div class="panel panel-info">...</div>
+<div class="panel panel-warning">...</div>
+<div class="panel panel-danger">...</div> -->
 	{% endfor %}
 </ul>	
 </aside>
-
-<div id="service-content">
-<ul>
-	{% for result in results %}
-	<li>{{ result.name }}:{{ result.value }}</li>
-	{% endfor %}
-</ul>
+{% if service %}
+<div id="service-content" class="col-md-5">
+<div class="panel panel-info">
+	<div class="panel-heading"> 
+		<h3 class="panel-title">{{ service.name }} (ping: {{ service.ping }}) {{service.url}} {{service.ip}}</h3> </div>
+	<div class="panel-body">
+	<ul>
+		
+		{% for result in results %}
+		<li>{{ result.name }}:{{ result.value }}</li>
+		{% endfor %}
+	</ul>
+	</div>
+</div>
 
 </div>
+{% endif %}
 {% endblock %}
