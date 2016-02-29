@@ -16,8 +16,8 @@ var dns = require('dns')
 
 var Schema = mongoose.Schema
 
-/*mongoose.connect('mongodb://localhost/csm')*/
-mongoose.connect('mongodb://brvo:BRV0@ds061375.mongolab.com:61375/heroku_7qhftjcs')
+mongoose.connect('mongodb://localhost/csm')
+/*mongoose.connect('mongodb://brvo:BRV0@ds061375.mongolab.com:61375/heroku_7qhftjcs')*/
 
 // Declara tus modelos en este espacio
 
@@ -66,9 +66,9 @@ var app = express()
 app.use(session({
 	secret: 'keyboard cat',
 	/*store: new MongoStore(),*/
-    store: new MongoStore({
+    /*store: new MongoStore({
         server: process.env.MONGOLAB_URI    
-    }),
+    }),*/
 	saveUninitialized: true,
 	resave: true
 }))
