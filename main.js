@@ -39,6 +39,7 @@ var ServiceSchema = new Schema({
 	port: {type:Number, default: 80},
 	responsePattern: String,
 	created: { type: Date, default: Date.now },
+	user: { type: Schema.Types.ObjectId, ref: 'User' },
 })
 
 var Service = mongoose.model('Service', ServiceSchema)
@@ -124,7 +125,10 @@ app.use(function (req, res, next) {
 
 // TODO Integrate filtered services by user to locals
 app.use(function(req, res, next){
-	Service.find({}, function(err, docs){
+	if(!req.session.userId){
+		return next()
+	}
+	Service.find({user:res.locals.user}, function(err, docs){
 		if(err){
 			res.send(500, 'Internal server error')
 		}
@@ -171,6 +175,7 @@ app.post('/create-service', function(req, res){
 			host : {url :req.body.host,},
 			port: req.body.port,
 			responsePattern: req.body.responsePattern,
+			user: res.locals.user,
 		},
 		function(err, serv){
 			if(err){
@@ -190,7 +195,9 @@ app.post('/create-service', function(req, res){
 
 app.get('/service/:id', function (req, res) {
 	
-	Service.findOne({_id: req.params.id}, function(err, serv){
+	Service.findOne({_id: req.params.id})
+		.populate('user')
+		.exec(function(err, serv){
 		
 		if(err){
 			return res.send(500, 'Internal Server Error')
@@ -258,7 +265,7 @@ app.get('/service/:id', function (req, res) {
 			results.push({name : 'statusMessage', value: response['statusMessage']})
 			results.push({name : 'contentType', value: response.headers['content-type'] })
 			results.push({name : 'elapsedTime', value: response['elapsedTime']})
-		
+
 
 			res.render('index', { service: serv, results:results})
 		})
