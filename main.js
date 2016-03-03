@@ -16,8 +16,11 @@ var dns = require('dns')
 
 var Schema = mongoose.Schema
 
-/*mongoose.connect('mongodb://localhost/csm')*/
-mongoose.connect('mongodb://heroku_g2p8n3d9:h46lh0j1p48g1d2gak7hcumugg@ds019078.mlab.com:19078/heroku_g2p8n3d9')
+if (process.env.NODE_ENV === 'production') {
+	mongoose.connect('mongodb://heroku_g2p8n3d9:h46lh0j1p48g1d2gak7hcumugg@ds019078.mlab.com:19078/heroku_g2p8n3d9')
+}else{
+	mongoose.connect('mongodb://localhost/csm')
+}
 
 // Declara tus modelos en este espacio
 
@@ -186,14 +189,15 @@ app.post('/create-service', function(req, res){
 
 
 app.get('/service/:id', function (req, res) {
-	var notifications = []
-
+	
 	Service.findOne({_id: req.params.id}, function(err, serv){
 		
-		/*console.log(serv)*/
+		if(err){
+			return res.send(500, 'Internal Server Error')
+		}
 		
 		var results = []
-		var pingSession = ping.createSession ()
+		var pingSession = ping.createSession ({packetSize: 64})
 		/*var domain = "telegana.tv"*/
 		var domain = serv.host.url.split('/')[0]
 		console.log(domain)
@@ -256,12 +260,25 @@ app.get('/service/:id', function (req, res) {
 			results.push({name : 'elapsedTime', value: response['elapsedTime']})
 		
 
-			res.render('index', { notifications:notifications, service: serv, results:results})
+			res.render('index', { service: serv, results:results})
 		})
 		
 		
 	})
 
+})
+
+app.get('/delete-service/:id', function(req, res){
+	
+	Service.findOne({_id: req.params.id}).remove( function(err, serv){
+		if(err){
+			return res.send(500, 'Internal Server Error')
+		}
+
+		req.flash('success', 'Se borró correctamente el servicio.')
+		return res.redirect('/')
+
+	})
 })
 
 

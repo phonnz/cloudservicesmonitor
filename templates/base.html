@@ -31,11 +31,11 @@
       
       <ul class="nav navbar-nav navbar-right">
         
-		<li><a href="/create-service">Agregar servicio</a></li>
 		{% if user %}
+			<li><a href="/create-service">Agregar servicio</a></li>
 			<li><a href="/sign-out">Cerrar sesión</a></li>
 		{% else %}
-		<!-- <li><a href="/sign-up">Registro</a></li> -->
+		<li><a href="/sign-up">Registro</a></li>
 		<li>
 		<form class="form-inline" method="POST" action="/sign-in">
 			  <div class="form-group">
