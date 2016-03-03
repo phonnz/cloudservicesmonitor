@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="centered-content">
 	{% if error %}
 		<p>{{ error.message }}</p>
 	{% endif %}
@@ -22,9 +23,9 @@
 		</div>
 		
 
-		<button type="submit" class="btn btn-success">Agregar servicio</button>
+		<button type="submit" class="btn btn-success pull-right">Agregar servicio</button>
 	</form>
+
+</div>
 {% endblock %}
 
-
-[{'type_channel': 'Television','name_channel': 'BBC','channel_themes': [{'color': '#0C1C1B','alternative_back_image': ','channel_id': 1,'main_button': 'http://bbc.blob.core.windows.net/bbc/2015_10_13_17_51_24_btn_siete_on.png','id': 8}],'id': 1,'hb_code': 330001},]

@@ -6,13 +6,13 @@ var uuid = require('uuid')
 var bcrypt = require('bcrypt-nodejs')
 
 var session = require('express-session')
+var RedisStore = require('connect-redis')(session)
 var MongoStore = require('express-session-mongo')
 var flash = require('flash')
 
 var request = require('request')
 var ping = require('net-ping')
 var dns = require('dns')
-/*var fs = require("fs")*/
 
 var Schema = mongoose.Schema
 
@@ -21,6 +21,15 @@ mongoose.connect('mongodb://localhost/csm')
 
 // Declara tus modelos en este espacio
 
+var UserSchema = Schema({
+	email: String,
+	password: String,
+	uuid : {type: String, default: uuid.v4}
+})
+
+var User = mongoose.model('User', UserSchema)
+
+
 var ServiceSchema = new Schema({
 	name: String,
 	host: {url: String, ip: String},
@@ -28,8 +37,6 @@ var ServiceSchema = new Schema({
 	responsePattern: String,
 	created: { type: Date, default: Date.now },
 })
-
-
 
 var Service = mongoose.model('Service', ServiceSchema)
 
@@ -54,8 +61,6 @@ ServiceSchema.pre('save', function (next) {
   next();
 });
 
-
-
 // Termina la declaracion de modelos
 
 
@@ -63,15 +68,21 @@ ServiceSchema.pre('save', function (next) {
 var app = express()
 
 // Add sessions and flash
-app.use(session({
-	secret: 'keyboard cat',
-	/*store: new MongoStore(),*/
-    /*store: new MongoStore({
-        server: process.env.MONGOLAB_URI    
-    }),*/
+var sessionConfig = {
 	saveUninitialized: true,
 	resave: true
-}))
+}
+
+// Configuramos el store y secreto dependiendo si es heroku o local
+if (process.env.NODE_ENV === 'production') {
+	sessionConfig.secret = 'WYYZ5epfgC3AmF348DNXXC3jsrtYgPv5hTMB6qYw'
+	sessionConfig.store = new RedisStore({url: process.env.REDISTOGO_URL})
+}else{
+	sessionConfig.secret = 'keyboard cat'
+	sessionConfig.store = new MongoStore()
+
+}
+app.use(session(sessionConfig))
 // Correr en MongoDB:
 // use express-sessions
 // db.sessions.ensureIndex( { "lastAccess": 1 }, { expireAfterSeconds: 3600 } )
@@ -93,8 +104,22 @@ app.use( bodyParser.urlencoded({ extended:false }) )
 app.use('/assets', express.static('public'));
 
 // Declara tus url handlers en este espacio
+app.use(function (req, res, next) {
+	if(!req.session.userId){
+		return next()
+	}
 
+	User.findOne({uuid: req.session.userId}, function(err, user){
+		if(err){
+			return res.send(500, 'Internal Server Error')
+		}
 
+		res.locals.user = user
+		next()
+	})
+})
+
+// TODO Integrate filtered services by user to locals
 app.use(function(req, res, next){
 	Service.find({}, function(err, docs){
 		if(err){
@@ -113,8 +138,12 @@ app.use(function(req, res, next){
 		notifications.push(res.locals.flash.pop())
 	}
 
+	res.locals.notifications = notifications
+
 	next()
 })
+
+
 
 app.get('/', function (req, res) {
 	
@@ -237,18 +266,83 @@ app.get('/service/:id', function (req, res) {
 
 
 app.get('/sign-up', function (req, res){
-	var error = res.locals.flash.pop()
+	/*var error = res.locals.flash.pop()*/
 
 	res.render('sign-up', {
-		error: error
+		/*error: error*/
 	})
 })
 
+app.post('/sign-up', function (req, res){
+	if(!req.body.email || !req.body.password){
+		req.flash('danger', 'To sign up you need a email and a password')
+		return res.redirect('/sign-up')		
+	}
+
+	User.findOne({email: req.body.email}, function(err, user){
+		if(err){
+			return res.send(500, 'Internal Server Error')
+		}
+
+		if(user){
+			req.flash('danger', 'El correo ya está registrado')
+			return res.redirect('/sign-up')
+		}
+
+		bcrypt.hash(req.body.password, null/* Salt */, null, function(err, hashedPassword) {
+			if(err){
+				return res.send(500, 'Internal Server Error')
+			}
+
+			User.create({
+				username: req.body.username,
+				password: hashedPassword
+			}, function(err, doc){
+				if(err){
+					return res.send(500, 'Internal Server Error')
+				}
+
+				req.session.userId = doc.uuid
+				res.redirect('/')
+			})
+		});
+	})
+})
+
+
 app.get('/sign-in', function (req, res){
-	var error = res.locals.flash.pop()
+	/*var error = res.locals.flash.pop()*/
 
 	res.render('log-in',{
-		error: error
+		/*error: error*/
+	})
+})
+
+app.post('/sign-in', function (req, res){
+	if(!req.body.email || !req.body.password){
+		req.flash('danger', 'Para iniciar sesión es necesario escribir email y password')
+		return res.redirect('/sign-in')
+	}
+
+	User.findOne({email: req.body.email}, function(err, user){
+		if(err){
+			return res.send(500, 'Internal Server Error')
+		}
+
+		if(!user){
+			console.log('No user')
+			req.flash('danger', 'El usuario no existe')
+			return res.redirect('/sign-in')
+		}
+
+		bcrypt.compare(req.body.password, user.password, function(err, result){
+			if(err){
+				return res.send(500, 'Internal Server Error')
+			}
+			console.log('Si password')
+			req.session.userId = user.uuid
+			res.redirect('/')
+		})
 	})
 })
 
