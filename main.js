@@ -295,7 +295,7 @@ app.post('/sign-up', function (req, res){
 			}
 
 			User.create({
-				username: req.body.username,
+				email: req.body.email,
 				password: hashedPassword
 			}, function(err, doc){
 				if(err){
@@ -339,7 +339,6 @@ app.post('/sign-in', function (req, res){
 			if(err){
 				return res.send(500, 'Internal Server Error')
 			}
-			console.log('Si password')
 			req.session.userId = user.uuid
 			res.redirect('/')
 		})
