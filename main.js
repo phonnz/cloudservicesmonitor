@@ -16,8 +16,8 @@ var dns = require('dns')
 
 var Schema = mongoose.Schema
 
-mongoose.connect('mongodb://localhost/csm')
-/*mongoose.connect('mongodb://brvo:BRV0@ds061375.mongolab.com:61375/heroku_7qhftjcs')*/
+/*mongoose.connect('mongodb://localhost/csm')*/
+mongoose.connect('mongodb://heroku_g2p8n3d9:h46lh0j1p48g1d2gak7hcumugg@ds019078.mlab.com:19078/heroku_g2p8n3d9')
 
 // Declara tus modelos en este espacio
 
@@ -75,7 +75,7 @@ var sessionConfig = {
 
 // Configuramos el store y secreto dependiendo si es heroku o local
 if (process.env.NODE_ENV === 'production') {
-	sessionConfig.secret = 'WYYZ5epfgC3AmF348DNXXC3jsrtYgPv5hTMB6qYw'
+	sessionConfig.secret = '0b4925ed09ab47f25976904a6f96d36d'
 	sessionConfig.store = new RedisStore({url: process.env.REDISTOGO_URL})
 }else{
 	sessionConfig.secret = 'keyboard cat'
