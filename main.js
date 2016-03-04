@@ -52,9 +52,8 @@ ServiceSchema.pre('save', function (next) {
 
 	for(i = 0; i < this.host.url.length; i++){
 		if(this.host.url.charAt(i) > '9'){
-			console.log('Have chars')
 			isDomain = true
-			next()
+			break
 		}
 		if(!isDomain) {
 			this.host.ip = this.host.url
@@ -62,8 +61,8 @@ ServiceSchema.pre('save', function (next) {
 		}
 	}
 	
-  next();
-});
+  next()
+})
 
 // Termina la declaracion de modelos
 
@@ -257,10 +256,12 @@ app.get('/service/:id', function (req, res) {
 			console.log(par)
 		})
 		*/
-			/*results.push({name : 'defaultEncoding', value: response['_readableState']['defaultEncoding']})*/
-			results.push({name : 'webserver', value: (response['headers']['server']).split(' ')[0]})
+			
+			/*results.push({name : 'defaultEncoding', value: (response['_readableState']['defaultEncoding'] || '' ) })*/
+			console.log(response)
+			/*results.push({name : 'webserver', value: (response['headers']['server']).split(' ')[0]})
 			results.push({name : 'server', value: (response['headers']['server']).split(' ')[1]})
-			results.push({name : 'serverDate', value:response['headers']['date'] })
+			results.push({name : 'serverDate', value:response['headers']['date'] })*/
 			results.push({name : 'statusCode', value: response['statusCode']})
 			results.push({name : 'statusMessage', value: response['statusMessage']})
 			results.push({name : 'contentType', value: response.headers['content-type'] })
